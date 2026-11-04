@@ -1,14 +1,14 @@
 
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 
 import {
   BookOpen,
   CheckCircle,
   Clock,
   AlertCircle,
-  TrendingUp,
   CalendarDays,
   Target,
 } from "lucide-react";
@@ -27,8 +27,38 @@ export default function StudentProgressPage() {
     loading,
   } = useAssignments();
 
-  // Get student's assignments
+  // Store today's date after the component mounts.
+  // This prevents Next.js prerendering errors.
+  const [today, setToday] = useState<string | null>(null);
 
+  useEffect(() => {
+    const currentDate = new Date();
+
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+    const day = String(currentDate.getDate()).padStart(2, "0");
+
+    setToday(`${year}-${month}-${day}`);
+  }, []);
+
+  // Format dates for display.
+  const formatDate = (dateValue: string) => {
+    if (!dateValue) return "N/A";
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+      return "Invalid date";
+    }
+
+    return date.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  // Get only assignments assigned to the current student.
   const myAssignments = useMemo(() => {
     if (!currentUser) return [];
 
@@ -37,12 +67,8 @@ export default function StudentProgressPage() {
     );
   }, [assignments, currentUser]);
 
-  // Calculate progress information
-
+  // Calculate student progress.
   const report = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
     let submitted = 0;
     let pending = 0;
     let overdue = 0;
@@ -54,19 +80,20 @@ export default function StudentProgressPage() {
           item.studentId === currentUser?.id
       );
 
-      const isSubmitted =
-        submission?.status === "submitted";
+      const isSubmitted = submission?.status === "submitted";
 
-      const dueDate = new Date(
-        `${assignment.dueDate}T00:00:00`
-      );
+      // ISO date strings (YYYY-MM-DD) can be compared directly.
+      const isOverdue =
+        !isSubmitted &&
+        today !== null &&
+        assignment.dueDate < today;
 
       if (isSubmitted) {
         submitted++;
       } else {
         pending++;
 
-        if (dueDate < today) {
+        if (isOverdue) {
           overdue++;
         }
       }
@@ -75,7 +102,7 @@ export default function StudentProgressPage() {
         ...assignment,
         isSubmitted,
         submittedAt: submission?.submittedAt ?? null,
-        isOverdue: !isSubmitted && dueDate < today,
+        isOverdue,
       };
     });
 
@@ -94,24 +121,23 @@ export default function StudentProgressPage() {
       completion,
       details,
     };
-  }, [myAssignments, submissions, currentUser]);
+  }, [myAssignments, submissions, currentUser, today]);
 
-  // Recent submissions
+  // Recent submissions.
+  const recentSubmissions = useMemo(() => {
+    return report.details
+      .filter((item) => item.isSubmitted && item.submittedAt)
+      .sort(
+        (a, b) =>
+          new Date(b.submittedAt!).getTime() -
+          new Date(a.submittedAt!).getTime()
+      );
+  }, [report.details]);
 
-  const recentSubmissions = report.details
-    .filter((item) => item.isSubmitted && item.submittedAt)
-    .sort(
-      (a, b) =>
-        new Date(b.submittedAt!).getTime() -
-        new Date(a.submittedAt!).getTime()
-    );
-
-  if (loading) {
+  // Loading state.
+  if (loading || !today) {
     return (
-      <DashboardLayout
-        role="student"
-        title="My Progress"
-      >
+      <DashboardLayout role="student" title="My Progress">
         <div className="glass rounded-2xl p-10 text-center">
           <div className="w-8 h-8 border-4 border-[var(--teal)] border-t-transparent rounded-full animate-spin mx-auto" />
 
@@ -124,15 +150,9 @@ export default function StudentProgressPage() {
   }
 
   return (
-    <DashboardLayout
-      role="student"
-      title="My Progress"
-    >
-
+    <DashboardLayout role="student" title="My Progress">
       {/* Heading */}
-
       <section className="mb-8">
-
         <p className="text-sm font-semibold text-[var(--pink)]">
           PERFORMANCE OVERVIEW
         </p>
@@ -144,13 +164,10 @@ export default function StudentProgressPage() {
         <p className="text-sm text-[var(--muted)] mt-2">
           Track your assignment completion and submission history.
         </p>
-
       </section>
 
       {/* Statistics */}
-
       <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-
         <ProgressCard
           title="Total Assignments"
           value={report.total}
@@ -178,15 +195,11 @@ export default function StudentProgressPage() {
           icon={<AlertCircle size={21} />}
           color="pink"
         />
-
       </section>
 
       {/* Overall completion */}
-
       <section className="glass rounded-2xl p-6 mt-7">
-
         <div className="flex items-center gap-3">
-
           <div className="w-11 h-11 rounded-xl bg-[var(--teal-light)] flex items-center justify-center">
             <Target
               size={23}
@@ -203,11 +216,9 @@ export default function StudentProgressPage() {
               Your total submission performance
             </p>
           </div>
-
         </div>
 
         <div className="flex justify-between items-center mt-7 mb-3">
-
           <span className="text-sm text-[var(--muted)]">
             Assignment progress
           </span>
@@ -215,22 +226,25 @@ export default function StudentProgressPage() {
           <span className="text-2xl font-bold text-[var(--teal)]">
             {report.completion}%
           </span>
-
         </div>
 
-        <div className="h-4 bg-[var(--border)] rounded-full overflow-hidden">
-
+        <div
+          className="h-4 bg-[var(--border)] rounded-full overflow-hidden"
+          role="progressbar"
+          aria-label="Assignment completion"
+          aria-valuenow={report.completion}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        >
           <div
             className="h-full bg-[var(--teal)] rounded-full transition-all duration-700"
             style={{
               width: `${report.completion}%`,
             }}
           />
-
         </div>
 
         <div className="flex flex-wrap justify-between gap-2 mt-4">
-
           <p className="text-xs text-[var(--muted)]">
             {report.submitted} of {report.total} completed
           </p>
@@ -238,15 +252,11 @@ export default function StudentProgressPage() {
           <p className="text-xs text-[var(--muted)]">
             {report.pending} remaining
           </p>
-
         </div>
-
       </section>
 
       {/* Assignment breakdown */}
-
       <section className="mt-10">
-
         <div className="mb-5">
           <h3 className="text-xl font-bold">
             Assignment Breakdown
@@ -273,17 +283,13 @@ export default function StudentProgressPage() {
             </p>
           </div>
         ) : (
-
           <div className="space-y-4">
-
             {report.details.map((assignment) => (
               <div
                 key={assignment.id}
                 className="glass rounded-2xl p-5"
               >
-
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-
                   <div>
                     <h4 className="font-semibold">
                       {assignment.title}
@@ -292,10 +298,7 @@ export default function StudentProgressPage() {
                     <p className="text-xs text-[var(--muted)] mt-2 flex items-center gap-2">
                       <CalendarDays size={14} />
 
-                      Due:{" "}
-                      {new Date(
-                        `${assignment.dueDate}T00:00:00`
-                      ).toLocaleDateString("en-IN")}
+                      Due: {formatDate(assignment.dueDate)}
                     </p>
                   </div>
 
@@ -312,30 +315,22 @@ export default function StudentProgressPage() {
                       Pending
                     </span>
                   )}
-
                 </div>
 
-                {assignment.isSubmitted && (
+                {assignment.isSubmitted && assignment.submittedAt && (
                   <p className="text-xs text-[var(--muted)] mt-3">
                     Submitted on:{" "}
-                    {new Date(
-                      assignment.submittedAt!
-                    ).toLocaleDateString("en-IN")}
+                    {formatDate(assignment.submittedAt)}
                   </p>
                 )}
-
               </div>
             ))}
-
           </div>
         )}
-
       </section>
 
       {/* Submission history */}
-
       <section className="mt-10">
-
         <div className="mb-5">
           <h3 className="text-xl font-bold">
             Submission History
@@ -358,17 +353,13 @@ export default function StudentProgressPage() {
             </p>
           </div>
         ) : (
-
           <div className="glass rounded-2xl p-5 space-y-4">
-
             {recentSubmissions.map((assignment) => (
               <div
                 key={assignment.id}
                 className="flex items-center justify-between gap-3 border-b border-[var(--border)] last:border-0 pb-4 last:pb-0"
               >
-
                 <div className="flex items-center gap-3 min-w-0">
-
                   <div className="w-10 h-10 shrink-0 rounded-xl bg-[var(--teal-light)] flex items-center justify-center">
                     <CheckCircle
                       size={19}
@@ -382,32 +373,24 @@ export default function StudentProgressPage() {
                     </p>
 
                     <p className="text-xs text-[var(--muted)] mt-1">
-                      {new Date(
-                        assignment.submittedAt!
-                      ).toLocaleDateString("en-IN")}
+                      {formatDate(assignment.submittedAt!)}
                     </p>
                   </div>
-
                 </div>
 
                 <span className="text-xs text-[var(--teal)] font-semibold shrink-0">
                   Completed
                 </span>
-
               </div>
             ))}
-
           </div>
         )}
-
       </section>
-
     </DashboardLayout>
   );
 }
 
-// Reusable progress card
-
+// Reusable progress card.
 function ProgressCard({
   title,
   value,
@@ -416,16 +399,14 @@ function ProgressCard({
 }: {
   title: string;
   value: number;
-  icon: React.ReactNode;
+  icon: ReactNode;
   color: "teal" | "pink";
 }) {
   const pink = color === "pink";
 
   return (
     <div className="glass glass-hover rounded-2xl p-5">
-
       <div className="flex justify-between items-center gap-2">
-
         <p className="text-sm text-[var(--muted)]">
           {title}
         </p>
@@ -439,13 +420,11 @@ function ProgressCard({
         >
           {icon}
         </div>
-
       </div>
 
       <h3 className="text-3xl font-bold mt-5">
         {value}
       </h3>
-
     </div>
   );
 }
