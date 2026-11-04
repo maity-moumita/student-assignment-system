@@ -1,69 +1,28 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function ThemeToggle() {
-  const [dark, setDark] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-
-    const isDark = savedTheme === "dark";
-
-    setDark(isDark);
-
-    document.documentElement.classList.toggle(
-      "dark",
-      isDark
-    );
-
-    setMounted(true);
-  }, []);
-
-  function toggleTheme() {
-    const newTheme = !dark;
-
-    setDark(newTheme);
-
-    document.documentElement.classList.toggle(
-      "dark",
-      newTheme
-    );
-
-    localStorage.setItem(
-      "theme",
-      newTheme ? "dark" : "light"
-    );
-  }
-
-  if (!mounted) {
-    return (
-      <div className="glass w-11 h-11 rounded-xl" />
-    );
-  }
+  const isDark = theme === "dark";
 
   return (
     <button
       type="button"
       onClick={toggleTheme}
       aria-label={
-        dark ? "Switch to light theme" : "Switch to dark theme"
+        isDark ? "Switch to light mode" : "Switch to dark mode"
       }
-      className="glass rounded-xl p-3 transition hover:scale-105"
+      title={isDark ? "Light mode" : "Dark mode"}
+      className="w-8 h-8 rounded-lg flex items-center justify-center text- transition-all duration-200"
     >
-      {dark ? (
-        <Sun
-          size={20}
-          className="text-[var(--pink)]"
-        />
+      {isDark ? (
+        <Sun className="text-[#DC143C]" size={18} />
       ) : (
-        <Moon
-          size={20}
-          className="text-[var(--teal)]"
-        />
+        <Moon className="text-[#DC143C]" size={18} />
       )}
     </button>
   );

@@ -191,7 +191,7 @@ export default function StudentPage() {
         </p>
 
         <h2 className="text-2xl md:text-3xl font-bold mt-2">
-          Hello, {currentUser?.name} 👋
+          Hello, {currentUser?.name}
         </h2>
 
         <p className="text-sm text-[var(--muted)] mt-2">
