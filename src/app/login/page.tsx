@@ -284,7 +284,7 @@ export default function LoginPage() {
           {/* Footer */}
           <footer className="flex flex-col sm:flex-row justify-between gap-3 mt-7">
             <p className="text-[10px] text-[var(--muted)]">
-              © 2026 Assignment Hub. All rights reserved.
+              © 2026 Assignment Hub. All rights reserved. Moumita Maity
             </p>
 
             <p className="text-[10px] text-[var(--muted)]">
