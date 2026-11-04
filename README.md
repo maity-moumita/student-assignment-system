@@ -1,4 +1,4 @@
-# Student Assignment Management System
+# Student Assignment System
 
 A responsive web-based assignment management dashboard built with Next.js, React, TypeScript, and Tailwind CSS. The platform provides separate workspaces for administrators/professors and students to manage assignments, track submissions, and monitor academic progress.
 
