@@ -126,7 +126,7 @@ export default function AdminAssignmentsPage() {
       const stats = getStats(assignment);
 
       const dueDate = new Date(
-        `${assignment.dueDate}T00:00:00`
+        assignment.dueDate
       );
 
       const today = new Date();
@@ -494,7 +494,7 @@ export default function AdminAssignmentsPage() {
               today.setHours(0, 0, 0, 0);
 
               const dueDate = new Date(
-                `${assignment.dueDate}T00:00:00`
+                assignment.dueDate
               );
 
               const overdue =

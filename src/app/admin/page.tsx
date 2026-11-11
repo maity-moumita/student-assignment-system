@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import DashboardLayout from "@/components/common/DashboardLayout";
+import CourseGrid from "@/components/common/CourseGrid";
 
 import AdminStats from "@/components/admin/AdminStats";
 
@@ -244,6 +245,8 @@ export default function AdminPage() {
         </button>
 
       </section>
+
+      <CourseGrid role="admin" userId={currentUser?.id ?? ""} />
 
       {/* Statistics */}
 
