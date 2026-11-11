@@ -19,9 +19,12 @@ import SubmissionDialog from "@/components/student/SubmissionDialog";
 import StudentStats from "@/components/student/StudentStats";
 
 import { useAuth } from "@/context/AuthContext";
+import { useGroups } from "@/context/GroupContext";
+import Link from "next/link";
 import { useAssignments } from "@/context/AssignmentContext";
 
 import type { Assignment } from "@/types";
+import { initialUsers } from "@/data/Data";
 
 type StatusFilter = "all" | "submitted" | "not_submitted";
 
@@ -31,6 +34,7 @@ type SortOption = "dueDate" | "newest" | "title";
 
 export default function StudentAssignmentsPage() {
   const { currentUser } = useAuth();
+  const { getMyGroup } = useGroups();
 
   const {
     assignments,
@@ -165,10 +169,18 @@ export default function StudentAssignmentsPage() {
   function handleSubmission() {
     if (!currentUser || !selectedAssignment) return;
 
-    submitAssignment(
-      selectedAssignment.id,
-      currentUser.id
-    );
+    if (selectedAssignment.submissionType === "group") {
+      const group = selectedAssignment.courseId
+        ? getMyGroup(selectedAssignment.courseId, currentUser.id)
+        : undefined;
+      if (!group || group.leaderId !== currentUser.id) return;
+      const timestamp = new Date().toISOString();
+      group.memberIds.forEach((memberId) =>
+        submitAssignment(selectedAssignment.id, memberId, currentUser.id, timestamp)
+      );
+    } else {
+      submitAssignment(selectedAssignment.id, currentUser.id);
+    }
 
     setSelectedAssignment(null);
   }
@@ -400,22 +412,38 @@ export default function StudentAssignmentsPage() {
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
 
             {filteredAssignments.map((assignment) => {
-              const submission = getSubmission(assignment.id);
+              const ownSubmission = getSubmission(assignment.id);
+              const group = assignment.submissionType === "group" && assignment.courseId && currentUser
+                ? getMyGroup(assignment.courseId, currentUser.id)
+                : undefined;
+              const groupSubmission = group
+                ? submissions.find(item => item.assignmentId === assignment.id && group.memberIds.includes(item.studentId) && item.status === "submitted")
+                : undefined;
+              const submission = assignment.submissionType === "group" ? groupSubmission : ownSubmission;
+              const isLeader = !!group && group.leaderId === currentUser?.id;
+              const noGroup = assignment.submissionType === "group" && !group;
+              const leaderName = group ? (initialUsers.find(user => user.id === group.leaderId)?.name || "your group leader") : "";
+              const acknowledgedBy = submission?.acknowledgedBy === group?.leaderId ? leaderName : "you";
+              const groupMessage = noGroup
+                ? "You are not part of any group. Create or join one to submit this assignment."
+                : group && submission
+                  ? `Acknowledged by ${acknowledgedBy} on ${new Date(submission.submittedAt || "").toLocaleString("en-IN")}`
+                  : group && !isLeader
+                    ? `Only ${leaderName} can acknowledge this group submission.`
+                    : undefined;
 
               return (
-                <AssignmentCard
-                  key={assignment.id}
-                  assignment={assignment}
-                  status={
-                    submission?.status ?? "not_submitted"
-                  }
-                  submittedAt={
-                    submission?.submittedAt ?? null
-                  }
-                  onSubmit={() =>
-                    setSelectedAssignment(assignment)
-                  }
-                />
+                <div key={assignment.id} className="relative">
+                  <AssignmentCard
+                    assignment={assignment}
+                    status={submission?.status ?? "not_submitted"}
+                    submittedAt={submission?.submittedAt ?? null}
+                    canSubmit={assignment.submissionType !== "group" || isLeader}
+                    groupMessage={groupMessage}
+                    onSubmit={() => setSelectedAssignment(assignment)}
+                  />
+                  {noGroup && <Link href="/student/groups" className="absolute bottom-[5.15rem] right-5 text-xs font-bold text-[#53675C] underline underline-offset-4">Create or join a group</Link>}
+                </div>
               );
             })}
 

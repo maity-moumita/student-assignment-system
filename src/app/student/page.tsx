@@ -11,6 +11,9 @@ import {
 } from "lucide-react";
 
 import DashboardLayout from "@/components/common/DashboardLayout";
+import CourseGrid from "@/components/common/CourseGrid";
+import Link from "next/link";
+import { useGroups } from "@/context/GroupContext";
 
 import StudentStats from "@/components/student/StudentStats";
 
@@ -32,6 +35,7 @@ type SortOption = "newest" | "dueDate" | "title";
 
 export default function StudentPage() {
   const { currentUser } = useAuth();
+  const { getMyGroup } = useGroups();
 
   const {
     assignments,
@@ -114,7 +118,7 @@ export default function StudentPage() {
       today.setHours(0, 0, 0, 0);
 
       const dueDate = new Date(
-        `${assignment.dueDate}T00:00:00`
+        assignment.dueDate
       );
 
       const isOverdue =
@@ -168,10 +172,14 @@ export default function StudentPage() {
   function handleSubmission() {
     if (!currentUser || !selectedAssignment) return;
 
-    submitAssignment(
-      selectedAssignment.id,
-      currentUser.id
-    );
+    if (selectedAssignment.submissionType === "group") {
+      const group = selectedAssignment.courseId ? getMyGroup(selectedAssignment.courseId, currentUser.id) : undefined;
+      if (!group || group.leaderId !== currentUser.id) return;
+      const timestamp = new Date().toISOString();
+      group.memberIds.forEach((memberId) => submitAssignment(selectedAssignment.id, memberId, currentUser.id, timestamp));
+    } else {
+      submitAssignment(selectedAssignment.id, currentUser.id);
+    }
 
     setSelectedAssignment(null);
   }
@@ -199,6 +207,8 @@ export default function StudentPage() {
         </p>
 
       </section>
+
+      <CourseGrid role="student" userId={currentUser?.id ?? ""} />
 
       {/* Statistics */}
 
@@ -387,22 +397,18 @@ export default function StudentPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
             {filteredAssignments.map((assignment) => {
-              const submission = getSubmission(assignment.id);
-
+              const ownSubmission = getSubmission(assignment.id);
+              const group = assignment.submissionType === "group" && assignment.courseId && currentUser ? getMyGroup(assignment.courseId, currentUser.id) : undefined;
+              const groupSubmission = group ? submissions.find(item => item.assignmentId === assignment.id && group.memberIds.includes(item.studentId) && item.status === "submitted") : undefined;
+              const submission = assignment.submissionType === "group" ? groupSubmission : ownSubmission;
+              const isLeader = !!group && group.leaderId === currentUser?.id;
+              const noGroup = assignment.submissionType === "group" && !group;
+              const groupMessage = noGroup ? "You are not part of any group. Create or join one to submit this assignment." : group && !isLeader && !submission ? `Only ${group.leaderId === currentUser?.id ? "you" : "your group leader"} can acknowledge this submission. Your leader is ${group.leaderId}.` : group && submission ? `Acknowledged by ${submission.acknowledgedBy === group.leaderId ? "your group leader" : "the group leader"} on ${new Date(submission.submittedAt || "").toLocaleString("en-IN")}` : undefined;
               return (
-                <AssignmentCard
-                  key={assignment.id}
-                  assignment={assignment}
-                  status={
-                    submission?.status ?? "not_submitted"
-                  }
-                  submittedAt={
-                    submission?.submittedAt ?? null
-                  }
-                  onSubmit={() =>
-                    setSelectedAssignment(assignment)
-                  }
-                />
+                <div key={assignment.id} className="relative">
+                  <AssignmentCard assignment={assignment} status={submission?.status ?? "not_submitted"} submittedAt={submission?.submittedAt ?? null} canSubmit={assignment.submissionType !== "group" || isLeader} groupMessage={groupMessage} onSubmit={() => setSelectedAssignment(assignment)} />
+                  {noGroup && <Link href="/student/groups" className="absolute bottom-[5.15rem] right-5 text-xs font-semibold text-[#53675C] underline underline-offset-4">Create or join a group</Link>}
+                </div>
               );
             })}
 
