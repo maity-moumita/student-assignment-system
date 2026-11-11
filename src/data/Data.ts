@@ -3,6 +3,7 @@ import type {
   User,
   Assignment,
   Submission,
+  Course,
 } from "@/types";
 
 // Demo users
@@ -52,6 +53,14 @@ export const initialUsers: User[] = [
   },
 ];
 
+// Semester courses shared by students and professors
+export const initialCourses: Course[] = [
+  { id: "course-react", name: "Advanced React Development", code: "CS-301", semester: "Fall 2026", professorId: "admin-1", studentIds: ["student-1", "student-2", "student-3", "student-4", "student-5"], description: "Modern frontend architecture, hooks and application patterns." },
+  { id: "course-js", name: "JavaScript Engineering", code: "CS-214", semester: "Fall 2026", professorId: "admin-1", studentIds: ["student-1", "student-2", "student-3"], description: "Deepen your understanding of the JavaScript language and runtime." },
+  { id: "course-web", name: "Web Design Studio", code: "DES-108", semester: "Fall 2026", professorId: "admin-2", studentIds: ["student-1", "student-2", "student-3", "student-4", "student-5"], description: "Build accessible, responsive and expressive web experiences." },
+  { id: "course-node", name: "Server-side Development", code: "CS-325", semester: "Fall 2026", professorId: "admin-2", studentIds: ["student-3", "student-4", "student-5"], description: "APIs, HTTP fundamentals and scalable Node.js services." },
+];
+
 // Demo assignments
 
 export const initialAssignments: Assignment[] = [
@@ -60,7 +69,9 @@ export const initialAssignments: Assignment[] = [
     title: "React Fundamentals",
     description:
       "Build a simple React application using components, props and state.",
-    dueDate: "2026-11-12",
+    dueDate: "2026-11-12T23:59",
+    courseId: "course-react",
+    submissionType: "individual",
     driveLink: "https://drive.google.com/",
     createdBy: "admin-1",
     assignedTo: [
@@ -77,7 +88,9 @@ export const initialAssignments: Assignment[] = [
     title: "JavaScript ES6",
     description:
       "Practice arrow functions, promises, map, filter and destructuring.",
-    dueDate: "2026-11-15",
+    dueDate: "2026-11-15T23:59",
+    courseId: "course-js",
+    submissionType: "group",
     driveLink: "https://drive.google.com/",
     createdBy: "admin-1",
     assignedTo: [
@@ -92,7 +105,9 @@ export const initialAssignments: Assignment[] = [
     title: "HTML and CSS",
     description:
       "Create a responsive webpage using HTML and CSS.",
-    dueDate: "2026-11-05",
+    dueDate: "2026-11-05T23:59",
+    courseId: "course-web",
+    submissionType: "individual",
     driveLink: "https://drive.google.com/",
     createdBy: "admin-2",
     assignedTo: [
@@ -109,7 +124,9 @@ export const initialAssignments: Assignment[] = [
     title: "Node.js Basics",
     description:
       "Create a basic HTTP server using Node.js.",
-    dueDate: "2026-11-20",
+    dueDate: "2026-11-20T23:59",
+    courseId: "course-node",
+    submissionType: "group",
     driveLink: "https://drive.google.com/",
     createdBy: "admin-2",
     assignedTo: [
