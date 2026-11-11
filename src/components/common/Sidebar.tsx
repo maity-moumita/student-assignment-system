@@ -33,6 +33,11 @@ const studentLinks = [
     icon: BookOpen,
   },
   {
+    name: "My Groups",
+    href: "/student/groups",
+    icon: Users,
+  },
+  {
     name: "My Progress",
     href: "/student/progress",
     icon: ChartNoAxesCombined,
@@ -91,7 +96,7 @@ export default function Sidebar({
         className={`
           fixed md:sticky top-0 left-0 z-50
           h-screen w-64 flex-shrink-0
-          glass-strong p-5 flex flex-col
+          joineazy-sidebar p-5 flex flex-col
           transition-transform duration-300
           md:translate-x-0
           ${
@@ -107,20 +112,20 @@ export default function Sidebar({
 
           <div className="flex items-center gap-3">
 
-            <div className="w-10 h-10 rounded-xl bg-[var(--teal)] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[#D7F35C] flex items-center justify-center">
               <GraduationCap
                 size={24}
-                className="text-white"
+                className="text-[#14231D]"
               />
             </div>
 
             <div>
               <h2 className="font-bold text-lg">
-                Assignment Hub
+                Joineazy
               </h2>
 
-              <p className="text-xs text-[var(--muted)]">
-                Management Portal
+              <p className="text-xs sidebar-muted">
+                Academic workspace
               </p>
             </div>
 
@@ -139,21 +144,21 @@ export default function Sidebar({
 
         {/* User role */}
 
-        <div className="pink-surface rounded-xl p-3 mb-8">
+        <div className="royal-panel rounded-xl p-3 mb-8">
 
-          <p className="text-xs opacity-70">
-            LOGGED IN AS
+          <p className="text-xs opacity-70 text-[#D7F35C]">
+            YOUR WORKSPACE
           </p>
 
           <p className="font-semibold mt-1 capitalize">
-            {role}
+            {role === "admin" ? "Professor" : "Student"}
           </p>
 
         </div>
 
         {/* Navigation */}
 
-        <p className="text-xs font-semibold text-[var(--muted)] mb-3 tracking-wider">
+        <p className="text-xs font-semibold sidebar-muted mb-3 tracking-wider">
           MENU
         </p>
 
@@ -176,8 +181,8 @@ export default function Sidebar({
                   transition-all duration-200
                   ${
                     active
-                      ? "bg-[var(--teal-light)] text-[var(--teal)] font-semibold"
-                      : "text-[var(--muted)] hover:bg-[var(--pink-light)] hover:text-[var(--pink)]"
+                      ? "sidebar-active"
+                      : "sidebar-link"
                   }
                 `}
               >
@@ -191,13 +196,13 @@ export default function Sidebar({
 
         {/* Bottom section */}
 
-        <div className="mt-auto glass rounded-xl p-4">
+        <div className="mt-auto rounded-xl border border-white/10 bg-white/[0.06] p-4">
 
           <p className="text-sm font-semibold">
             Need assistance?
           </p>
 
-          <p className="text-xs text-[var(--muted)] mt-1">
+          <p className="text-xs sidebar-muted mt-1">
             Manage your work efficiently.
           </p>
 

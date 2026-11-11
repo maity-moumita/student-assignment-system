@@ -76,10 +76,10 @@ export default function Header({
             className="flex items-center gap-2 glass rounded-xl p-2"
           >
 
-            <div className="w-9 h-9 rounded-lg bg-[var(--pink-light)] flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg bg-[var(--accent-light)] flex items-center justify-center">
               <UserCircle
                 size={21}
-                className="text-[var(--pink)]"
+                className="text-[#53675C]"
               />
             </div>
 
@@ -89,7 +89,7 @@ export default function Header({
               </p>
 
               <p className="text-xs text-[var(--muted)] capitalize">
-                {currentUser?.role}
+                {currentUser?.role === "admin" ? "Professor" : "Student"}
               </p>
             </div>
 
@@ -114,7 +114,7 @@ export default function Header({
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex items-center gap-3 w-full p-3 rounded-lg text-sm hover:bg-[var(--pink-light)] hover:text-[var(--pink)]"
+                  className="flex items-center gap-3 w-full p-3 rounded-lg text-sm hover:bg-[var(--accent-light)] hover:text-[#53675C]"
                 >
                   <LogOut size={18} />
                   Logout

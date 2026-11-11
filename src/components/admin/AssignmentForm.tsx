@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 
 import { X, Save } from "lucide-react";
 
-import type { Assignment, User } from "@/types";
+import type { Assignment, User, SubmissionType } from "@/types";
+import { initialCourses } from "@/data/Data";
 
 type AssignmentFormProps = {
   open: boolean;
@@ -26,6 +27,8 @@ export default function AssignmentForm({
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [driveLink, setDriveLink] = useState("");
+  const [courseId, setCourseId] = useState(initialCourses[0]?.id ?? "");
+  const [submissionType, setSubmissionType] = useState<SubmissionType>("individual");
 
   const [assignAll, setAssignAll] = useState(true);
 
@@ -46,6 +49,8 @@ export default function AssignmentForm({
       setDescription(editingAssignment.description);
       setDueDate(editingAssignment.dueDate);
       setDriveLink(editingAssignment.driveLink);
+      setCourseId(editingAssignment.courseId ?? initialCourses[0]?.id ?? "");
+      setSubmissionType(editingAssignment.submissionType ?? "individual");
 
       setAssignAll(
         editingAssignment.assignedTo.length === students.length
@@ -59,6 +64,8 @@ export default function AssignmentForm({
       setDescription("");
       setDueDate("");
       setDriveLink("");
+      setCourseId(initialCourses[0]?.id ?? "");
+      setSubmissionType("individual");
       setAssignAll(true);
       setSelectedStudents([]);
     }
@@ -86,13 +93,13 @@ export default function AssignmentForm({
       return;
     }
 
-    if (!dueDate || Number.isNaN(new Date(`${dueDate}T00:00:00`).getTime())) {
+    if (!dueDate || Number.isNaN(new Date(dueDate).getTime())) {
       setError("Please select a valid due date.");
       return;
     }
 
     if (!driveLink.trim()) {
-      setError("Please enter a Google Drive link.");
+      setError("Please enter a OneDrive link.");
       return;
     }
 
@@ -104,7 +111,7 @@ export default function AssignmentForm({
         return;
       }
     } catch {
-      setError("Please enter a valid Drive URL.");
+      setError("Please enter a valid OneDrive URL.");
       return;
     }
 
@@ -124,6 +131,8 @@ export default function AssignmentForm({
       title: title.trim(),
       description: description.trim(),
       dueDate,
+      courseId,
+      submissionType,
       driveLink: driveLink.trim(),
       createdBy: editingAssignment?.createdBy ?? "",
       assignedTo,
@@ -190,6 +199,11 @@ export default function AssignmentForm({
 
         <form onSubmit={handleSubmit} className="space-y-5">
 
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div><label htmlFor="assignment-course" className="block text-sm font-semibold mb-2">Course *</label><select id="assignment-course" value={courseId} onChange={e=>setCourseId(e.target.value)} className="w-full glass rounded-xl p-3" required>{initialCourses.map(course=><option key={course.id} value={course.id}>{course.code} · {course.name}</option>)}</select></div>
+            <div><label htmlFor="submission-type" className="block text-sm font-semibold mb-2">Submission type *</label><select id="submission-type" value={submissionType} onChange={e=>setSubmissionType(e.target.value as SubmissionType)} className="w-full glass rounded-xl p-3"><option value="individual">Individual</option><option value="group">Group</option></select></div>
+          </div>
+
           {/* Title */}
 
           <div>
@@ -235,7 +249,7 @@ export default function AssignmentForm({
 
             <input
               id="assignment-due-date"
-              type="date"
+              type="datetime-local"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
               className="w-full glass rounded-xl p-3 outline-none focus:border-[var(--teal)]"
@@ -247,7 +261,7 @@ export default function AssignmentForm({
 
           <div>
             <label htmlFor="assignment-drive-link" className="block text-sm font-semibold mb-2">
-              Google Drive Link *
+              OneDrive Link *
             </label>
 
             <input
@@ -255,7 +269,7 @@ export default function AssignmentForm({
               type="url"
               value={driveLink}
               onChange={(e) => setDriveLink(e.target.value)}
-              placeholder="https://drive.google.com/..."
+              placeholder="https://onedrive.live.com/..."
               className="w-full glass rounded-xl p-3 outline-none focus:border-[var(--teal)]"
               required
             />

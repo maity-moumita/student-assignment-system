@@ -20,9 +20,9 @@ export default function ThemeToggle() {
       className="w-8 h-8 rounded-lg flex items-center justify-center text- transition-all duration-200"
     >
       {isDark ? (
-        <Sun className="text-[#DC143C]" size={18} />
+        <Sun className="text-[#14231D]" size={18} />
       ) : (
-        <Moon className="text-[#DC143C]" size={18} />
+        <Moon className="text-[#14231D]" size={18} />
       )}
     </button>
   );

@@ -16,6 +16,8 @@ type AssignmentCardProps = {
   status: "submitted" | "not_submitted";
   submittedAt: string | null;
   onSubmit: () => void;
+  canSubmit?: boolean;
+  groupMessage?: string;
 };
 
 export default function AssignmentCard({
@@ -23,14 +25,14 @@ export default function AssignmentCard({
   status,
   submittedAt,
   onSubmit,
+  canSubmit = true,
+  groupMessage,
 }: AssignmentCardProps) {
   const today = new Date();
 
   today.setHours(0, 0, 0, 0);
 
-  const dueDate = new Date(
-    `${assignment.dueDate}T00:00:00`
-  );
+  const dueDate = new Date(assignment.dueDate);
 
   const isOverdue =
     status !== "submitted" && dueDate < today;
@@ -112,7 +114,7 @@ export default function AssignmentCard({
 
         <CalendarDays size={17} />
 
-        <span>Due: {formattedDate}</span>
+        <span>Due: {dueDate.toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" })}</span>
 
       </div>
 
@@ -122,6 +124,8 @@ export default function AssignmentCard({
           {new Date(submittedAt).toLocaleDateString("en-IN")}
         </p>
       )}
+
+      {groupMessage && <p className="mt-4 text-xs leading-5 text-[var(--muted)] bg-[var(--surface-secondary)] rounded-xl p-3">{groupMessage}</p>}
 
       {/* Bottom actions */}
 
@@ -134,16 +138,16 @@ export default function AssignmentCard({
           className="glass flex-1 min-w-0 rounded-xl p-3 text-sm font-medium flex items-center justify-center gap-2 hover:text-[var(--teal)] transition"
         >
           <ExternalLink size={16} />
-          Drive Link
+          OneDrive Link
         </a>
 
-        {status !== "submitted" && (
+        {status !== "submitted" && canSubmit && (
           <button
             type="button"
             onClick={onSubmit}
             className="teal-button flex-1 min-w-0 rounded-xl p-3 text-sm font-semibold"
           >
-            Submit Assignment
+            {assignment.submissionType === "group" ? "Acknowledge for group" : "Acknowledge submission"}
           </button>
         )}
 
