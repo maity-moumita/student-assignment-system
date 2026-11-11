@@ -1,26 +1,23 @@
 
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 
 import "./globals.css";
 
 import { AuthProvider } from "@/context/AuthContext";
 import { AssignmentProvider } from "@/context/AssignmentContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { GroupProvider } from "@/context/GroupContext";
 
-const geist = Geist({
-  variable: "--font-geist",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Assignment Hub",
-  description: "Student Assignment Management System",
+  title: "Student Assignment System",
+  description: "A workspace for courses, assignments and collaborative learning.",
 };
 
 const themeScript = `
@@ -53,11 +50,11 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
 
-      <body className={`${geist.variable} ${geistMono.variable}`}>
+      <body className={jakarta.variable}>
         <ThemeProvider>
           <AuthProvider>
             <AssignmentProvider>
-              {children}
+              <GroupProvider>{children}</GroupProvider>
             </AssignmentProvider>
           </AuthProvider>
         </ThemeProvider>
