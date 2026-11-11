@@ -38,7 +38,9 @@ type AssignmentContextType = {
 
   submitAssignment: (
     assignmentId: string,
-    studentId: string
+    studentId: string,
+    acknowledgedBy?: string,
+    submittedAtOverride?: string
   ) => void;
 
   clearError: () => void;
@@ -457,7 +459,9 @@ export function AssignmentProvider({
 
   function submitAssignment(
     assignmentId: string,
-    studentId: string
+    studentId: string,
+    acknowledgedBy?: string,
+    submittedAtOverride?: string
   ) {
     const assignment = assignments.find(
       (item) =>
@@ -483,7 +487,7 @@ export function AssignmentProvider({
       return;
     }
 
-    const submittedAt = new Date().toISOString();
+    const submittedAt = submittedAtOverride ?? new Date().toISOString();
 
     setSubmissions((previous) => {
       const alreadyExists = previous.find(
@@ -500,6 +504,7 @@ export function AssignmentProvider({
                 ...item,
                 status: "submitted",
                 submittedAt,
+                acknowledgedBy: acknowledgedBy ?? studentId,
               }
             : item
         );
@@ -513,6 +518,7 @@ export function AssignmentProvider({
           studentId,
           status: "submitted",
           submittedAt,
+          acknowledgedBy: acknowledgedBy ?? studentId,
         },
       ];
     });
