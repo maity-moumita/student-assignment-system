@@ -1,35 +1,107 @@
 # Student Assignment System
 
-A responsive web-based assignment management dashboard built with Next.js, React, TypeScript, and Tailwind CSS. The platform provides separate workspaces for administrators/professors and students to manage assignments, track submissions, and monitor academic progress.
+A responsive academic course and assignment management platform built with **Next.js, React, TypeScript, and Tailwind CSS**.
+
+Joineazy provides dedicated workspaces for professors and students to manage coursework, track assignment progress, coordinate group submissions, and stay updated on academic activities.
+
+---
 
 ## Features
 
-### Admin / Professor Dashboard
-- View assignment statistics and dashboard overview.
+### 1. Professor Dashboard
+
+- View dashboard statistics and assignment overviews.
 - Create, edit, and delete assignments.
-- Assign assignments to all students or selected students.
-- Add assignment descriptions, due dates, and Google Drive links.
-- Track individual student submission statuses.
-- Monitor class completion percentages.
-- View assignments created by the logged-in administrator.
+- Assign work to all students or selected students.
+- Associate assignments with specific courses.
+- Add assignment titles, descriptions, deadlines, and OneDrive links.
+- Configure individual or group submission types.
+- Monitor submitted and pending assignments.
+- Track submission progress and class completion percentages.
+- View assignments created by the currently logged-in professor.
+- Filter and organize assignment records.
 
-### Student Dashboard
-- View assigned assignments.
+### 2. Student Dashboard
+
+- View enrolled courses and assigned assignments.
 - Check assignment descriptions and deadlines.
-- Access assignment resources through Google Drive links.
-- Submit assignments through a confirmation flow.
-- Track submitted and pending assignments.
-- View overall assignment completion progress.
+- Access learning resources through OneDrive links.
+- Acknowledge individual submissions through a two-step confirmation flow.
+- View submission status and acknowledgement timestamps.
+- Track pending and completed assignments.
+- Monitor overall assignment completion progress.
+- Access course-specific assignment information.
 
-### Additional Features
-- Role-based dashboards for administrators and students.
+### 3. Group Management
+
+- Create groups for individual courses.
+- Join existing groups.
+- Automatically assign group leadership to the creator.
+- View group members and group leader information.
+- Restrict group assignment acknowledgement to the group leader.
+- Share group acknowledgement status and timestamps with group members.
+- Prevent students without a group from acknowledging group assignments.
+
+### 4. Authentication and Access
+
+- Role-based dashboards for professors and students.
 - Demo login using predefined accounts.
-- Persistent data using browser localStorage.
+- Self-service registration with role selection.
+- Simulated JWT-style sessions stored in localStorage.
+- Logout and session clearing.
+- Role-based navigation and protected application routes.
+
+### 5. Additional Features
+
+- Course-specific professor and student dashboards.
+- Persistent demo data using browser localStorage.
 - Search, filtering, and sorting capabilities.
 - Overdue assignment indicators.
-- Light and dark themes.
-- Responsive design for desktop, tablet, and mobile.
+- Assignment progress indicators.
 - Loading, empty, and error states.
+- Light and dark themes.
+- Responsive layouts for desktop, tablet, and mobile devices.
+
+---
+
+## Demo Accounts
+
+Use the following predefined accounts to explore the application.
+
+The demo login uses account selection rather than password authentication.
+
+| Role | Name | Email |
+|---|---|---|
+| Professor | John Smith | john@gmail.com |
+| Professor | Sarah Wilson | sarah@gmail.com |
+| Student | Rahul Sharma | rahul@gmail.com |
+| Student | Priya Patel | priya@gmail.com |
+| Student | Amit Kumar | amit@gmail.com |
+| Student | Sneha Roy | sneha@gmail.com |
+| Student | Rohit Das | rohit@gmail.com |
+
+---
+
+## Design System
+
+Joineazy follows a modern visual identity inspired by the supplied design reference.
+
+| Design Element | Color / Font | Usage |
+|---|---|---|
+| Deep Forest | `#14231D` | Navigation and high-emphasis surfaces |
+| Soft Sage | `#93A5A1` | Supporting text and secondary elements |
+| Electric Lime | `#D7F35C` | Primary actions, active states, and progress |
+| Typography | Plus Jakarta Sans | Primary application font |
+
+### Design Principles
+
+- Generous whitespace and clear visual hierarchy.
+- Rounded cards and subtle borders.
+- Consistent spacing and typography.
+- Clear assignment status indicators.
+- Accessible contrast and readable text.
+- Responsive layouts across screen sizes.
+- Consistent light and dark theme experiences.
 
 ---
 
@@ -37,11 +109,11 @@ A responsive web-based assignment management dashboard built with Next.js, React
 
 | Technology | Purpose |
 |---|---|
-| Next.js | React framework and routing |
-| React | UI development |
-| TypeScript | Type safety |
-| Tailwind CSS | Styling and responsive design |
-| Lucide React | Icons |
+| Next.js | Application framework and routing |
+| React | Component-based UI development |
+| TypeScript | Static typing and maintainability |
+| Tailwind CSS | Styling and responsive layouts |
+| Lucide React | Interface icons |
 | React Context API | Global state management |
 | localStorage | Client-side data persistence |
 
@@ -53,7 +125,7 @@ A responsive web-based assignment management dashboard built with Next.js, React
 
 Make sure you have the following installed:
 
-- Node.js (20 or later recommended)
+- Node.js 20 or later recommended
 - npm
 - Git
 
@@ -95,7 +167,7 @@ http://localhost:3000
 npm run build
 ```
 
-To run the production build locally:
+### 7. Run the production application
 
 ```bash
 npm start
@@ -103,7 +175,7 @@ npm start
 
 ---
 
-## Project Folder Structure
+## Project Structure
 
 ```text
 student-assignment-system/
@@ -111,15 +183,25 @@ student-assignment-system/
 ├── public/
 │
 ├── src/
-│   │
 │   ├── app/
 │   │   ├── admin/
+│   │   │   ├── courses/
+│   │   │   │   └── [courseId]/
+│   │   │   │       └── page.tsx
+│   │   │   ├── assignments/
+│   │   │   └── page.tsx
+│   │   │
+│   │   ├── student/
+│   │   │   ├── courses/
+│   │   │   │   └── [courseId]/
+│   │   │   │       └── page.tsx
+│   │   │   ├── groups/
 │   │   │   └── page.tsx
 │   │   │
 │   │   ├── login/
 │   │   │   └── page.tsx
 │   │   │
-│   │   ├── student/
+│   │   ├── register/
 │   │   │   └── page.tsx
 │   │   │
 │   │   ├── globals.css
@@ -134,6 +216,7 @@ student-assignment-system/
 │   ├── context/
 │   │   ├── AuthContext.tsx
 │   │   ├── AssignmentContext.tsx
+│   │   ├── GroupContext.tsx
 │   │   └── ThemeContext.tsx
 │   │
 │   ├── data/
@@ -143,9 +226,7 @@ student-assignment-system/
 │   │
 │   ├── types/
 │   │
-│   ├── utils/
-│   │
-│   └── ...
+│   └── utils/
 │
 ├── .gitignore
 ├── eslint.config.mjs
@@ -156,103 +237,169 @@ student-assignment-system/
 └── README.md
 ```
 
+*Note: The structure above represents the main application organization. Additional route and component files may exist in the project.*
+
 ### Folder Responsibilities
 
 | Folder | Responsibility |
 |---|---|
 | `app/` | Application routes and page layouts |
-| `components/admin/` | Admin-specific UI components |
-| `components/student/` | Student-specific UI components |
-| `components/common/` | Shared components such as theme toggle |
-| `context/` | Authentication, assignment, and theme state |
-| `data/` | Initial demo users, assignments, and submissions |
+| `components/admin/` | Professor dashboard components |
+| `components/student/` | Student dashboard components |
+| `components/common/` | Shared interface components |
+| `context/` | Authentication, assignments, groups, and theme state |
+| `data/` | Initial demo users, courses, assignments, and submissions |
 | `hooks/` | Reusable React hooks |
 | `types/` | TypeScript interfaces and types |
-| `utils/` | Reusable helper functions |
+| `utils/` | Reusable utility functions |
 
 ---
 
 ## Component Architecture
 
-The application follows a modular component-based architecture. Pages handle the overall layout and connect the required components, while individual components handle specific UI responsibilities.
+Joineazy follows a modular, component-based architecture. Pages coordinate application layouts and state, while reusable components handle individual interface responsibilities.
 
-### Admin Components
+### Professor Components
 
 Located in `src/components/admin/`.
 
 - **AdminStats:** Displays dashboard statistics.
 - **AssignmentForm:** Handles assignment creation and editing.
 - **AssignmentTable:** Displays and manages assignments.
-- **StudentStatus:** Displays individual student submission statuses.
+- **StudentStatus:** Displays student submission information.
 
 ### Student Components
 
 Located in `src/components/student/`.
 
-- **StudentStats:** Displays assignment statistics.
+- **StudentStats:** Displays student assignment statistics.
 - **AssignmentCard:** Displays assignment information and actions.
-- **SubmissionDialog:** Handles assignment submission confirmation.
+- **SubmissionDialog:** Handles submission acknowledgement and confirmation.
 
 ### Common Components
 
 Located in `src/components/common/`.
 
+- **DashboardLayout:** Provides shared dashboard structure.
 - **ThemeToggle:** Switches between light and dark themes.
-- Shared UI elements used across the application.
+- Shared navigation and interface elements.
 
-### State Management
+---
 
-The application uses React Context API to share state across components.
+## State Management
 
-**AuthContext**
+The application uses React Context API to manage shared state across components.
+
+### AuthContext
+
 - Maintains the currently logged-in user.
-- Handles demo login and authentication state.
-- Provides role information to the application.
+- Handles demo login and registration.
+- Maintains user role information.
+- Handles logout and simulated session state.
 
-**AssignmentContext**
+### AssignmentContext
+
 - Manages assignments and submissions.
 - Handles assignment creation, editing, and deletion.
-- Updates student submission statuses.
-- Synchronizes application data with localStorage.
+- Updates student acknowledgement statuses.
+- Tracks submission timestamps and progress.
+- Synchronizes assignment data with localStorage.
 
-**ThemeContext**
+### GroupContext
+
+- Manages course-specific groups.
+- Handles group creation and joining.
+- Maintains group membership and leadership.
+- Supports group acknowledgement workflows.
+
+### ThemeContext
+
 - Manages light and dark theme preferences.
 - Updates the document theme.
 - Persists the selected theme in localStorage.
 
 ---
 
-
 ## Key Design Decisions
 
 ### 1. Role-Based Architecture
 
-Separate admin and student experiences are provided based on the logged-in user's role. Each role has access to its relevant dashboard and functionality.
+Separate experiences are provided for professors and students. Users are directed to the appropriate dashboard according to their selected role.
 
-### 2. Context API for State Management
+### 2. Context API
 
-React Context API is used to share authentication, assignment, submission, and theme states without passing props through multiple component levels.
+React Context API provides centralized access to authentication, assignment, group, and theme state without excessive prop drilling.
 
-### 3. localStorage for Persistence
+### 3. localStorage Persistence
 
-The project uses browser localStorage to retain demo users' application data, assignments, submissions, and theme preferences across page refreshes.
+The application uses browser localStorage to retain demo users, assignments, submissions, groups, sessions, and theme preferences across page refreshes.
 
-**Note:** This is a frontend demonstration. localStorage is not a secure database or a replacement for server-side authentication and authorization.
+**Important:** This is a frontend demonstration. localStorage is not a secure database or a replacement for server-side authentication and authorization.
 
 ### 4. TypeScript
 
-TypeScript provides explicit data types for users, assignments, and submissions, helping reduce common development errors and improve maintainability.
+TypeScript interfaces define application data structures and help catch common development errors.
 
 ### 5. Reusable Components
 
-The UI is divided into smaller reusable components to keep the code organized, readable, and easier to maintain.
+The interface is divided into reusable components to improve readability, maintainability, and consistency.
 
 ### 6. Responsive Design
 
-Tailwind CSS utility classes are used to create layouts that adapt to different screen sizes.
+Tailwind CSS utility classes provide layouts that adapt to desktop, tablet, and mobile screen sizes.
 
 ### 7. Light and Dark Themes
 
-A centralized theme context controls the application's color scheme. Theme preferences are saved in localStorage to maintain the selected appearance.
+A centralized theme context controls the application's appearance and persists user preferences.
 
 ---
+
+## Submission Workflow
+
+### Individual Assignment
+
+1. The professor creates an individual assignment.
+2. Students assigned to the course can view the assignment.
+3. A student opens the assignment resource.
+4. The student follows the acknowledgement confirmation flow.
+5. The application records the student's submission status and timestamp.
+
+### Group Assignment
+
+1. The professor creates a group assignment.
+2. Students create or join a course-specific group.
+3. The group creator becomes its leader.
+4. The group leader acknowledges the assignment.
+5. The acknowledgement is shared across the group.
+
+---
+
+## Important Notes and Limitations
+
+- The application uses simulated authentication for demonstration purposes.
+- Application data is stored in browser localStorage.
+- No production database or server-side authentication is configured in this frontend demonstration.
+- localStorage data is browser-specific and can be cleared by the user.
+- Production deployment should introduce server-side authentication, authorization, persistent database storage, and appropriate validation.
+
+---
+
+## Future Improvements
+
+- MongoDB integration for persistent data storage.
+- Secure server-side authentication and authorization.
+- Real-time submission and group status updates.
+- Email and deadline notifications.
+- File upload and submission history.
+- Professor analytics and reporting.
+- More advanced course and student management.
+
+---
+
+## License
+
+This project was developed as an academic assignment and demonstration of frontend application development.
+
+---
+
+**Built with Next.js, React, TypeScript, and Tailwind CSS.**
